@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社区老年人腰椎滑脱风险评估</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f4e79'/%3E%3Cpath d='M10 10h12M10 16h12M10 22h12' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f3f5f7; --card:#ffffff; --line:#e5e9ee; --ink:#1f2937; --muted:#6b7280;
+    --primary:#1f4e79; --primary-2:#2f6699; --soft:#eef3f8; --good:#2e7d32; --bad:#c0392b;
+    --warn-bg:#fdf6ec; --warn-line:#f0c98a; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 18px 40px}
+  /* header */
+  header.band{background:linear-gradient(135deg,#1f4e79,#2f6699);color:#fff;padding:26px 0 22px}
+  header.band .wrap{padding-bottom:0}
+  header.band h1{font-size:24px;font-weight:700;letter-spacing:.5px}
+  header.band .sub{margin-top:6px;color:#dbe7f1;font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:999px;
+    padding:5px 13px;font-size:13px}
+  .chip b{font-weight:600}
+  /* layout */
+  .grid{display:grid;grid-template-columns:380px 1fr;gap:18px;margin-top:20px}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 1px 3px rgba(16,42,67,.08);padding:20px}
+  .card h2{font-size:16px;font-weight:600;margin-bottom:14px}
+  .card h2 .hint{font-weight:400;color:var(--muted);font-size:12px;margin-left:8px}
+  /* segmented tabs */
+  .seg{display:flex;background:var(--soft);border-radius:10px;padding:4px;gap:4px;margin-bottom:18px}
+  .seg button{flex:1;border:0;background:transparent;padding:8px 6px;border-radius:8px;font-size:14px;
+    color:var(--muted);cursor:pointer}
+  .seg button.active{background:#fff;color:var(--primary);font-weight:600;box-shadow:0 1px 2px rgba(16,42,67,.12)}
+  /* inputs */
+  .field{margin-bottom:15px}
+  .field label{display:block;font-size:13px;color:var(--ink);margin-bottom:6px;font-weight:500}
+  .field .unit{color:var(--muted);font-weight:400}
+  .field input[type=number]{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:15px;background:#fff}
+  .field input:focus{outline:none;border-color:var(--primary-2)}
+  .bin{display:flex;gap:8px}
+  .bin button{flex:1;border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 6px;font-size:14px;
+    color:var(--ink);cursor:pointer}
+  .bin button.active{border-color:var(--primary);background:var(--soft);color:var(--primary);font-weight:600}
+  .btn-row{display:flex;gap:10px;margin-top:18px}
+  .btn{border:0;border-radius:9px;padding:10px 18px;font-size:14px;cursor:pointer}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover{background:var(--primary-2)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .note{margin-top:12px;font-size:12px;color:var(--muted)}
+  .dirty{margin-top:12px;background:var(--warn-bg);border:1px solid var(--warn-line);color:#8a5a17;
+    border-radius:9px;padding:9px 12px;font-size:13px;display:none}
+  .dirty.show{display:block}
+  /* result */
+  .res-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .res-top .cap{font-size:12px;color:var(--muted)}
+  .res-top .meta{font-size:12px;color:var(--muted)}
+  .res-title{font-size:19px;font-weight:700;margin-top:2px}
+  .prob-label{margin-top:18px;font-size:13px;color:var(--muted)}
+  .prob{font-size:46px;font-weight:800;letter-spacing:-1px}
+  .prob small{font-size:22px;font-weight:600}
+  .verdict{margin-top:4px;font-size:14px;font-weight:600}
+  .verdict.high{color:var(--bad)}
+  .verdict.low{color:var(--good)}
+  /* gauge */
+  .gauge{position:relative;margin:26px 6px 34px;height:56px}
+  .gauge .track{position:absolute;top:26px;left:0;right:0;height:6px;border-radius:3px;background:#e8edf2}
+  .gauge .axis{position:absolute;top:38px;font-size:11px;color:var(--muted)}
+  .gauge .axis.l{left:0}.gauge .axis.r{right:0}
+  .gmarker{position:absolute;top:18px;width:1px;height:22px}
+  .gmarker .tag{position:absolute;top:-16px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px}
+  .gmarker.cutoff{background:#8a5a17}
+  .gmarker.cutoff .tag{color:#8a5a17}
+  .gmarker.prev{background:var(--muted)}
+  .gmarker.prev .tag{color:var(--muted)}
+  .dot{position:absolute;top:20px;width:14px;height:14px;border-radius:50%;background:var(--primary);
+    border:3px solid #fff;box-shadow:0 0 0 1px var(--primary);transform:translateX(-50%)}
+  .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  @media(max-width:560px){.stat-row{grid-template-columns:1fr}}
+  .stat{border:1px solid var(--line);border-radius:11px;padding:14px}
+  .stat .k{font-size:12px;color:var(--muted)}
+  .stat .v{font-size:24px;font-weight:700;margin-top:3px}
+  .stat .d{font-size:12px;color:var(--muted);margin-top:3px}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  /* compare */
+  .compare-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.compare-cards{grid-template-columns:1fr}}
+  .ccard{border:1px solid var(--line);border-radius:11px;padding:16px}
+  .ccard h3{font-size:15px;margin-bottom:6px}
+  .ccard .p{font-size:30px;font-weight:800}
+  table.metric{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+  table.metric th,table.metric td{border-top:1px solid var(--line);padding:9px 10px;text-align:center}
+  table.metric th:first-child,table.metric td:first-child{text-align:left}
+  table.metric thead th{border-top:0;color:var(--muted);font-weight:500}
+  .cmp-note{margin-top:12px;font-size:13px;color:var(--muted)}
+  /* accordions */
+  .acc{margin-top:18px}
+  .acc-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+  .acc-head{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+  .acc-head .arrow{transition:transform .2s;color:var(--muted)}
+  .acc-item.open .arrow{transform:rotate(90deg)}
+  .acc-body{display:none;padding:0 20px 18px}
+  .acc-item.open .acc-body{display:block}
+  .acc-body p{margin:8px 0;color:#374151;font-size:14px}
+  .acc-body ul{margin:8px 0 8px 20px;font-size:14px;color:#374151}
+  .acc-body li{margin:5px 0}
+  table.or{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+  table.or th,table.or td{border-top:1px solid var(--line);padding:8px 10px}
+  table.or th{color:var(--muted);font-weight:500;text-align:left}
+  table.or td.num,table.or th.num{text-align:right}
+  .formula{background:var(--soft);border-radius:10px;padding:12px 14px;font-size:13px;margin:10px 0;
+    font-family:ui-monospace,Consolas,monospace;overflow-x:auto}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
+  footer .sep{margin:0 8px}
+  @media print{
+    .actions,.btn-row,.seg,.dirty{display:none !important}
+    body{background:#fff}
+    .card{box-shadow:none;border:0}
+  }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <h1>社区老年人腰椎滑脱风险评估</h1>
+    <div class="sub">基于多因素 Logistic 回归的影像学滑脱危险因素预测模型</div>
+    <div class="chips">
+      <span class="chip">研究对象：60 岁及以上社区居民</span>
+      <span class="chip">队列 n=<b id="chip-n"></b></span>
+      <span class="chip">腰椎滑脱 <b id="chip-e"></b> 例（<b id="chip-rate"></b>）</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- 输入面板 -->
+    <aside class="card">
+      <h2>患者信息</h2>
+      <div class="seg" id="view-tabs">
+        <button data-view="simple" class="active">简化模型</button>
+        <button data-view="full">完整模型</button>
+        <button data-view="compare">两模型比较</button>
+      </div>
+      <div id="inputs"></div>
+      <div class="dirty" id="dirty">输入内容已修改，请重新计算以更新结果。</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-calc">计算风险</button>
+        <button class="btn btn-ghost" id="btn-reset">重置</button>
+      </div>
+      <div class="note">输入框默认值为研究队列的典型值，仅用于界面初始化，不代表临床正常范围。</div>
+    </aside>
+
+    <!-- 结果面板 -->
+    <section class="card" id="result-panel"></section>
+  </div>
+
+  <!-- 折叠说明 -->
+  <div class="acc">
+    <div class="acc-item open" id="acc-info">
+      <div class="acc-head"><span>模型信息</span><span class="arrow">▶</span></div>
+      <div class="acc-body" id="acc-info-body"></div>
+    </div>
+    <div class="acc-item" id="acc-formula">
+      <div class="acc-head"><span>模型公式</span><span class="arrow">▶</span></div>
+      <div class="acc-body" id="acc-formula-body"></div>
+    </div>
+    <div class="acc-item" id="acc-usage">
+      <div class="acc-head"><span>使用说明</span><span class="arrow">▶</span></div>
+      <div class="acc-body" id="acc-usage-body"></div>
+    </div>
+  </div>
+
+  <footer>
+    本工具仅用于辅助腰椎滑脱风险分层，不作为单独临床诊断或治疗决策依据。
+    <span class="sep">·</span>模型版本：Spondylolisthesis-Risk-2026-11
+    <span class="sep">·</span>队列：社区老年人 1200 例横断面研究
+  </footer>
+</div>
+
+<script>
+const MODEL = {"outcome": "腰椎滑脱（最大前滑移 ≥3 mm）", "cohort": {"n_all": 1200, "events_all": 263, "prevalence": 0.21916666666666668, "n_complete": 1148, "events_complete": 250}, "vars_meta": {"年龄（岁）": {"label": "年龄（岁）", "type": "continuous", "levels": null, "unit_scale": 5, "default": 71.5}, "性别": {"label": "性别", "type": "binary", "levels": {"0": "男性", "1": "女性"}, "unit_scale": 1, "default": 1}, "BMI（kg/m²）": {"label": "BMI（kg/m²）", "type": "continuous", "levels": null, "unit_scale": 1, "default": 24.34}, "重体力劳动年限（年）": {"label": "重体力劳动年限（年）", "type": "continuous", "levels": null, "unit_scale": 10, "default": 0.0}, "既往腰背损伤史": {"label": "既往腰背损伤史", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "吸烟史": {"label": "吸烟史", "type": "binary", "levels": {"0": "否", "1": "是（曾经吸烟）"}, "unit_scale": 1, "default": 0}, "糖尿病": {"label": "糖尿病", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}}, "full": {"intercept": -7.576006819067619, "coefs": {"年龄（岁）": 0.05179354896971731, "性别": 0.3991245007035458, "BMI（kg/m²）": 0.08795983264704497, "重体力劳动年限（年）": 0.017042924868391963, "既往腰背损伤史": 0.03489081715470277, "吸烟史": 0.07131799202554444, "糖尿病": -0.0758324850027371}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）", "既往腰背损伤史", "吸烟史", "糖尿病"], "auc": 0.6432561247216035, "brier": 0.163530332537667, "cutoff": 0.205789176971719, "sens": 0.7, "spec": 0.5478841870824054, "cal_intercept": 2.052689321231177e-15, "cal_slope": 1.0000000000000016, "n": 1148, "events": 250}, "simple": {"intercept": -7.515863697664736, "coefs": {"年龄（岁）": 0.05176022906820823, "性别": 0.3730693067775252, "BMI（kg/m²）": 0.08666754021548449, "重体力劳动年限（年）": 0.01710753631098164}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）"], "auc": 0.6431492204899777, "brier": 0.16362763450475468, "cutoff": 0.2064101819612738, "sens": 0.692, "spec": 0.5579064587973275, "cal_intercept": -1.4898441073645e-15, "cal_slope": 0.9999999999999991, "n": 1148, "events": 250}, "univariate": [{"var": "年龄（岁）", "OR": 1.254960604771786, "OR_low": 1.1285218680443456, "OR_high": 1.3955654419514354, "p": 2.7714339463694638e-05}, {"var": "性别", "OR": 1.4049767895921732, "OR_low": 1.0612212164316546, "OR_high": 1.8600832217905978, "p": 0.017548538971360834}, {"var": "BMI（kg/m²）", "OR": 1.0786786682331175, "OR_low": 1.0342539792525043, "OR_high": 1.1250115471077167, "p": 0.0004162265062741981}, {"var": "重体力劳动年限（年）", "OR": 1.1645621083958848, "OR_low": 1.0396712958068643, "OR_high": 1.3044554656661458, "p": 0.008484975853902912}, {"var": "既往腰背损伤史", "OR": 1.033220749105209, "OR_low": 0.6416740954227655, "OR_high": 1.6636874139015687, "p": 0.8930346194474982}, {"var": "吸烟史", "OR": 0.8912198604060928, "OR_low": 0.6513079739504031, "OR_high": 1.2195042458404466, "p": 0.4716832807990512}, {"var": "糖尿病", "OR": 0.9041215170278628, "OR_low": 0.6063189199635282, "OR_high": 1.348194309361046, "p": 0.6210123730889161}], "full_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05179354896971731, "unit_scale": 5, "OR": 1.2955920146374753, "OR_low": 1.1599987279887383, "OR_high": 1.4470349215837142, "p": 4.4040616474785255e-06}, {"var": "性别", "label": "女性 vs 男性", "unit": "—", "beta": 0.3991245007035458, "unit_scale": 1, "OR": 1.490519177742319, "OR_low": 1.0663482612218529, "OR_high": 2.0834163659365936, "p": 0.019494449867054547}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08795983264704497, "unit_scale": 1, "OR": 1.091944260636781, "OR_low": 1.0445884543928983, "OR_high": 1.14144691464217, "p": 0.00010091939007057515}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.017042924868391963, "unit_scale": 10, "OR": 1.185813751082301, "OR_low": 1.055430660732054, "OR_high": 1.332303773779472, "p": 0.004134172069494678}, {"var": "既往腰背损伤史", "label": "有 vs 无", "unit": "—", "beta": 0.03489081715470277, "unit_scale": 1, "OR": 1.0355066430657023, "OR_low": 0.6320437927987999, "OR_high": 1.696518532497541, "p": 0.8898308013582553}, {"var": "吸烟史", "label": "是（曾经吸烟） vs 否", "unit": "—", "beta": 0.07131799202554444, "unit_scale": 1, "OR": 1.0739226704224032, "OR_low": 0.7363273481902365, "OR_high": 1.5663005114258206, "p": 0.7110996793713229}, {"var": "糖尿病", "label": "有 vs 无", "unit": "—", "beta": -0.0758324850027371, "unit_scale": 1, "OR": 0.9269714751782353, "OR_low": 0.6087494138934967, "OR_high": 1.4115432330329072, "p": 0.7237555094886066}], "simple_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05176022906820823, "unit_scale": 5, "OR": 1.2953761876246932, "OR_low": 1.159846007409387, "OR_high": 1.44674332346329, "p": 4.435897575387088e-06}, {"var": "性别", "label": "女性 vs 男性", "unit": "—", "beta": 0.3730693067775252, "unit_scale": 1, "OR": 1.4521849826066366, "OR_low": 1.0829391899557104, "OR_high": 1.9473311551265262, "p": 0.012693670923774604}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08666754021548449, "unit_scale": 1, "OR": 1.090534060724666, "OR_low": 1.043648632814327, "OR_high": 1.1395257946092754, "p": 0.00011089130334074653}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.01710753631098164, "unit_scale": 10, "OR": 1.1865801700238066, "OR_low": 1.05650589648586, "OR_high": 1.33266885170912, "p": 0.0038790162257044914}], "auc_diff": 0.00010690423162584839, "auc_diff_ci": [-0.0031256606102519372, 0.003550499082842605]};
+
+const RANGES = {
+  '年龄（岁）': [60, 90],
+  'BMI（kg/m²）': [12, 40],
+  '重体力劳动年限（年）': [0, 60],
+};
+const VIEW_VARS = {
+  simple: MODEL.simple.vars,
+  full: MODEL.full.vars,
+  compare: MODEL.full.vars,
+};
+const MODEL_TITLE = {
+  simple: '简化 Logistic 模型（4 项危险因素）',
+  full: '完整 Logistic 模型（7 项候选因素）',
+};
+
+let state = { view: 'simple', vals: {}, dirty: false, last: null };
+
+function $(s){return document.querySelector(s)}
+
+function fmtPct(x, d=1){return (x*100).toFixed(d) + '%'}
+function fmtP(x){return x < 0.001 ? '<0.001' : x.toFixed(3)}
+
+function predict(model, vals){
+  let eta = model.intercept;
+  for(const v of model.vars){ eta += model.coefs[v] * Number(vals[v]); }
+  return 1/(1+Math.exp(-eta));
+}
+
+function defaults(){
+  const o = {};
+  for(const v of Object.keys(MODEL.vars_meta)){ o[v] = MODEL.vars_meta[v].default; }
+  return o;
+}
+
+/* ---------- 输入渲染 ---------- */
+function renderInputs(){
+  const box = $('#inputs');
+  box.innerHTML = '';
+  const vars = VIEW_VARS[state.view];
+  for(const v of vars){
+    const meta = MODEL.vars_meta[v];
+    const f = document.createElement('div');
+    f.className = 'field';
+    if(meta.type === 'continuous'){
+      const [lo, hi] = RANGES[v];
+      f.innerHTML = `<label>${meta.label} <span class="unit">（范围 ${lo}–${hi}）</span></label>
+        <input type="number" step="0.1" min="${lo}" max="${hi}" data-var="${v}" value="${state.vals[v]}">`;
+    } else {
+      const lv = meta.levels;
+      let btns = '';
+      for(const k of Object.keys(lv)){
+        const active = Number(state.vals[v]) === Number(k) ? 'active' : '';
+        btns += `<button type="button" class="${active}" data-var="${v}" data-val="${k}">${lv[k]}</button>`;
+      }
+      f.innerHTML = `<label>${meta.label}</label><div class="bin">${btns}</div>`;
+    }
+    box.appendChild(f);
+  }
+  // events
+  box.querySelectorAll('input[type=number]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ state.vals[inp.dataset.var] = parseFloat(inp.value); markDirty(); });
+  });
+  box.querySelectorAll('.bin button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const varName = b.dataset.var;
+      box.querySelectorAll(`.bin button[data-var="${varName}"]`).forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      state.vals[varName] = Number(b.dataset.val);
+      markDirty();
+    });
+  });
+}
+
+function markDirty(){ state.dirty = true; $('#dirty').classList.add('show'); }
+function clearDirty(){ state.dirty = false; $('#dirty').classList.remove('show'); }
+
+/* ---------- 结果渲染 ---------- */
+function gaugeHTML(p, model){
+  const MAX = 0.50;
+  const left = Math.min(100, Math.max(0, p/MAX*100));
+  const cutL = model.cutoff/MAX*100;
+  const prevL = MODEL.cohort.prevalence/MAX*100;
+  return `<div class="gauge">
+    <div class="track"></div>
+    <div class="axis l">0%</div><div class="axis r">${MAX*100}%</div>
+    <div class="gmarker cutoff" style="left:${cutL}%"><span class="tag">阈值 ${fmtPct(model.cutoff)}</span></div>
+    <div class="gmarker prev" style="left:${prevL}%"><span class="tag">队列检出率 ${fmtPct(MODEL.cohort.prevalence)}</span></div>
+    <div class="dot" style="left:${left}%"></div>
+  </div>`;
+}
+
+function singleResultHTML(key, p){
+  const m = MODEL[key];
+  const high = p >= m.cutoff;
+  const verdict = high
+    ? `<div class="verdict high">↑ 高于本研究统计学分类阈值 ${fmtPct(m.cutoff)}</div>`
+    : `<div class="verdict low">↓ 低于本研究统计学分类阈值 ${fmtPct(m.cutoff)}</div>`;
+  return `<div class="res-top">
+      <div><div class="cap">默认临床显示</div><div class="res-title">${MODEL_TITLE[key]}</div></div>
+      <div class="meta">n=${m.n}；滑脱事件=${m.events}</div>
+    </div>
+    <div class="prob-label">预测腰椎滑脱概率</div>
+    <div class="prob">${fmtPct(p)}<small></small></div>
+    ${verdict}
+    ${gaugeHTML(p, m)}
+    <div class="stat-row">
+      <div class="stat"><div class="k">统计学分类阈值</div><div class="v">${fmtPct(m.cutoff)}</div>
+        <div class="d">Youden 指数确定；非诊断 / 治疗阈值</div></div>
+      <div class="stat"><div class="k">研究队列检出率</div><div class="v">${fmtPct(MODEL.cohort.prevalence)}</div>
+        <div class="d">${MODEL.cohort.events_all}/${MODEL.cohort.n_all} 例</div></div>
+    </div>`;
+}
+
+function metricTable(){
+  const s = MODEL.simple, f = MODEL.full;
+  const rows = [
+    ['AUC（判别力）', s.auc.toFixed(3), f.auc.toFixed(3)],
+    ['Brier 评分（越低越好）', s.brier.toFixed(3), f.brier.toFixed(3)],
+    ['Youden 分类阈值', fmtPct(s.cutoff), fmtPct(f.cutoff)],
+    ['敏感度', fmtPct(s.sens), fmtPct(f.sens)],
+    ['特异度', fmtPct(s.spec), fmtPct(f.spec)],
+  ];
+  let h = `<table class="metric"><thead><tr><th>指标</th><th>简化模型</th><th>完整模型</th></tr></thead><tbody>`;
+  for(const r of rows){ h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`; }
+  h += `</tbody></table>`;
+  const ci = MODEL.auc_diff_ci;
+  h += `<div class="cmp-note">ΔAUC（完整 − 简化）=${MODEL.auc_diff.toFixed(3)}，95%CI ${ci[0].toFixed(3)}～${ci[1].toFixed(3)}；
+    两模型判别力接近，简化模型变量更少、便于床旁快速评估。</div>`;
+  return h;
+}
+
+function renderResult(){
+  const panel = $('#result-panel');
+  const pS = predict(MODEL.simple, state.vals);
+  const pF = predict(MODEL.full, state.vals);
+  state.last = { pS, pF };
+  let html = '';
+  if(state.view === 'simple'){
+    html = singleResultHTML('simple', pS);
+  } else if(state.view === 'full'){
+    html = singleResultHTML('full', pF);
+  } else {
+    html = `<div class="res-top"><div><div class="cap">两模型比较</div><div class="res-title">简化模型 vs 完整模型</div></div>
+      <div class="meta">完整病例 n=${MODEL.full.n}；事件=${MODEL.full.events}</div></div>
+      <div class="compare-cards" style="margin-top:16px">
+        <div class="ccard"><h3>${MODEL_TITLE.simple}</h3><div class="p">${fmtPct(pS)}</div>
+          <div class="${pS>=MODEL.simple.cutoff?'verdict high':'verdict low'}">${pS>=MODEL.simple.cutoff?'↑ 高于':'↓ 低于'}阈值 ${fmtPct(MODEL.simple.cutoff)}</div></div>
+        <div class="ccard"><h3>${MODEL_TITLE.full}</h3><div class="p">${fmtPct(pF)}</div>
+          <div class="${pF>=MODEL.full.cutoff?'verdict high':'verdict low'}">${pF>=MODEL.full.cutoff?'↑ 高于':'↓ 低于'}阈值 ${fmtPct(MODEL.full.cutoff)}</div></div>
+      </div>
+      ${metricTable()}`;
+  }
+  html += `<div class="actions">
+    <button class="btn btn-ghost" id="btn-dl">下载结果摘要</button>
+    <button class="btn btn-ghost" id="btn-print">打印 / 保存为 PDF</button>
+  </div>`;
+  panel.innerHTML = html;
+  $('#btn-dl').onclick = downloadSummary;
+  $('#btn-print').onclick = ()=>window.print();
+}
+
+/* ---------- 摘要下载 ---------- */
+function downloadSummary(){
+  const {pS, pF} = state.last;
+  const modelKey = state.view === 'full' ? 'full' : 'simple';
+  const p = state.view === 'full' ? pF : pS;
+  const m = MODEL[modelKey];
+  const time = new Date().toLocaleString('zh-CN');
+  const varLabel = v => MODEL.vars_meta[v].type === 'binary'
+    ? MODEL.vars_meta[v].levels[state.vals[v]] : state.vals[v];
+  let lines = [
+    '腰椎滑脱风险评估结果摘要',
+    '生成时间：' + time,
+    '模型：' + MODEL_TITLE[modelKey],
+    `队列：社区老年人 n=${MODEL.cohort.n_all}，滑脱 ${MODEL.cohort.events_all} 例（${fmtPct(MODEL.cohort.prevalence)}）；建模完整病例 n=${m.n}，事件 ${m.events} 例`,
+    '',
+    '输入信息：',
+  ];
+  for(const v of VIEW_VARS[state.view]){ lines.push(`  · ${MODEL.vars_meta[v].label}：${varLabel(v)}`); }
+  lines.push('', `预测腰椎滑脱概率：${fmtPct(p)}`);
+  lines.push(`分类：${p>=m.cutoff?'高于':'低于'}统计学分类阈值 ${fmtPct(m.cutoff)}（Youden 指数确定，非诊断 / 治疗阈值）`);
+  lines.push(`模型评价：AUC=${m.auc.toFixed(3)}，Brier=${m.brier.toFixed(3)}，敏感度=${fmtPct(m.sens)}，特异度=${fmtPct(m.spec)}`);
+  if(state.view === 'compare'){
+    lines.push(`两模型概率：简化 ${fmtPct(pS)}；完整 ${fmtPct(pF)}`);
+  }
+  lines.push('', '说明：本摘要为研究模型的辅助风险分层结果，不能替代影像诊断与临床判断，不作为单独治疗决策依据。');
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '腰椎滑脱风险评估摘要.txt';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- 说明内容 ---------- */
+function orTable(rows){
+  let h = `<table class="or"><thead><tr><th>变量 / 对比</th><th class="num">OR</th><th class="num">95%CI</th><th class="num">P</th></tr></thead><tbody>`;
+  for(const r of rows){
+    h += `<tr><td>${r.label}${r.unit!=='—' ? `（${r.unit}）` : ''}</td>
+      <td class="num">${r.OR.toFixed(2)}</td><td class="num">${r.OR_low.toFixed(2)}–${r.OR_high.toFixed(2)}</td>
+      <td class="num">${fmtP(r.p)}</td></tr>`;
+  }
+  h += `</tbody></table>`;
+  return h;
+}
+
+function formulaText(model, vars){
+  const terms = [`${model.intercept.toFixed(4)}（截距）`];
+  for(const v of vars){
+    const isBin = MODEL.vars_meta[v].type === 'binary';
+    const name = isBin ? (v === '性别' ? '女性（指示变量）' : `${MODEL.vars_meta[v].levels[1]}（指示变量）`) : v;
+    terms.push(`${model.coefs[v].toFixed(4)}·${name}`);
+  }
+  return `logit(P) = ln[P/(1−P)] = ${terms.join(' + ')}<br>P = 1 / [1 + exp(−logit(P))]`;
+}
+
+function renderInfo(){
+  const c = MODEL.cohort;
+  $('#chip-n').textContent = c.n_all;
+  $('#chip-e').textContent = c.events_all;
+  $('#chip-rate').textContent = fmtPct(c.prevalence);
+  const s = MODEL.simple, f = MODEL.full;
+  $('#acc-info-body').innerHTML = `
+    <p><b>研究设计：</b>社区老年人横断面研究，纳入 ${c.n_all} 名 60 岁及以上社区居民；以腰椎 X 线最大前滑移 ≥3 mm 判定腰椎滑脱，共检出 ${c.events_all} 例（${fmtPct(c.prevalence)}）。</p>
+    <p><b>建模口径：</b>主模型采用完整病例 ${c.n_complete} 例（滑脱 ${c.events_complete} 例）；结局为二分类变量（滑脱有 / 无），方法为多因素 Logistic 回归，OR 为患病优势比。</p>
+    <p><b>候选因素：</b>年龄、性别、BMI、重体力劳动年限、既往腰背损伤史、吸烟史、糖尿病。症状与身体功能指标（下腰痛、下肢症状、步速、握力等）在原研究中作为次要结局分析，未纳入滑脱预测模型。</p>
+    <p><b>模型构成：</b>完整模型纳入全部 7 项候选因素；简化模型仅保留调整后关联有统计学意义的 4 项（年龄、女性、BMI、重体力劳动年限）。</p>
+    <table class="metric"><thead><tr><th>评价指标</th><th>简化模型</th><th>完整模型</th></tr></thead><tbody>
+      <tr><td>AUC</td><td>${s.auc.toFixed(3)}</td><td>${f.auc.toFixed(3)}</td></tr>
+      <tr><td>Brier 评分</td><td>${s.brier.toFixed(3)}</td><td>${f.brier.toFixed(3)}</td></tr>
+      <tr><td>Youden 分类阈值</td><td>${fmtPct(s.cutoff)}</td><td>${fmtPct(f.cutoff)}</td></tr>
+      <tr><td>敏感度</td><td>${fmtPct(s.sens)}</td><td>${fmtPct(f.sens)}</td></tr>
+      <tr><td>特异度</td><td>${fmtPct(s.spec)}</td><td>${fmtPct(f.spec)}</td></tr>
+    </tbody></table>
+    <p style="margin-top:12px"><b>单因素粗关联（未调整，补充参考）：</b></p>
+    <table class="or"><thead><tr><th>变量</th><th class="num">粗 OR</th><th class="num">95%CI</th><th class="num">P</th></tr></thead><tbody>
+    ${MODEL.univariate.map(u=>`<tr><td>${u.var}</td><td class="num">${u.OR.toFixed(2)}</td>
+      <td class="num">${u.OR_low.toFixed(2)}–${u.OR_high.toFixed(2)}</td><td class="num">${fmtP(u.p)}</td></tr>`).join('')}
+    </tbody></table>`;
+
+  $('#acc-formula-body').innerHTML = `
+    <p><b>简化模型（4 项）</b></p>
+    <div class="formula">${formulaText(MODEL.simple, MODEL.simple.vars)}</div>
+    ${orTable(MODEL.simple_table)}
+    <p style="margin-top:16px"><b>完整模型（7 项）</b></p>
+    <div class="formula">${formulaText(MODEL.full, MODEL.full.vars)}</div>
+    ${orTable(MODEL.full_table)}`;
+
+  $('#acc-usage-body').innerHTML = `
+    <ul>
+      <li>选择模型视图（简化 / 完整 / 两模型比较），录入研究对象的各项因素后点击「计算风险」，工具输出预测滑脱概率及与分类阈值的比较。</li>
+      <li>分类阈值由训练队列 Youden 指数确定，用于研究性风险分层，<b>不是</b>诊断阈值或治疗决策阈值。</li>
+      <li>本模型基于横断面资料，输出为患病优势估计，不能预测个体未来是否新发滑脱；概率需结合影像、病史与临床查体综合判断。</li>
+      <li>输入值若超出本研究队列范围（年龄 60–90 岁、BMI 12–40、重体力劳动 0–60 年），外推不确定性增大，结果应谨慎解释。</li>
+      <li>性别编码：0=男性，1=女性；损伤史 / 吸烟史 / 糖尿病：0=无，1=有。吸烟史指曾经吸烟。</li>
+      <li>「下载结果摘要」可导出文本记录；「打印 / 保存为 PDF」可通过浏览器打印另存为 PDF。</li>
+    </ul>`;
+}
+
+/* ---------- 事件绑定 ---------- */
+$('#view-tabs').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  state.view = b.dataset.view;
+  document.querySelectorAll('#view-tabs button').forEach(x=>x.classList.toggle('active', x===b));
+  renderInputs(); renderResult(); clearDirty();
+});
+$('#btn-calc').addEventListener('click', ()=>{ renderResult(); clearDirty(); });
+$('#btn-reset').addEventListener('click', ()=>{ state.vals = defaults(); renderInputs(); renderResult(); clearDirty(); });
+document.querySelectorAll('.acc-head').forEach(h=>{
+  h.addEventListener('click', ()=>h.parentElement.classList.toggle('open'));
+});
+
+/* init */
+state.vals = defaults();
+renderInputs(); renderInfo(); renderResult();
+</script>
+</body>
+</html>
