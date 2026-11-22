@@ -90,11 +90,11 @@
   .stat .d{font-size:12px;color:var(--muted);margin-top:3px}
   .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
   /* compare */
-  .compare-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:560px){.compare-cards{grid-template-columns:1fr}}
+  .compare-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.compare-cards{grid-template-columns:1fr}}
   .ccard{border:1px solid var(--line);border-radius:11px;padding:16px}
-  .ccard h3{font-size:15px;margin-bottom:6px}
-  .ccard .p{font-size:30px;font-weight:800}
+  .ccard h3{font-size:14px;margin-bottom:6px;line-height:1.4}
+  .ccard .p{font-size:28px;font-weight:800}
   table.metric{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
   table.metric th,table.metric td{border-top:1px solid var(--line);padding:9px 10px;text-align:center}
   table.metric th:first-child,table.metric td:first-child{text-align:left}
@@ -147,7 +147,8 @@
       <div class="seg" id="view-tabs">
         <button data-view="simple" class="active">简化模型</button>
         <button data-view="full">完整模型</button>
-        <button data-view="compare">两模型比较</button>
+        <button data-view="extended">扩展模型</button>
+        <button data-view="compare">模型比较</button>
       </div>
       <div id="inputs"></div>
       <div class="dirty" id="dirty">输入内容已修改，请重新计算以更新结果。</div>
@@ -186,22 +187,28 @@
 </div>
 
 <script>
-const MODEL = {"outcome": "腰椎滑脱（最大前滑移 ≥3 mm）", "cohort": {"n_all": 1200, "events_all": 263, "prevalence": 0.21916666666666668, "n_complete": 1148, "events_complete": 250}, "vars_meta": {"年龄（岁）": {"label": "年龄（岁）", "type": "continuous", "levels": null, "unit_scale": 5, "default": 71.5}, "性别": {"label": "性别", "type": "binary", "levels": {"0": "男性", "1": "女性"}, "unit_scale": 1, "default": 1}, "BMI（kg/m²）": {"label": "BMI（kg/m²）", "type": "continuous", "levels": null, "unit_scale": 1, "default": 24.34}, "重体力劳动年限（年）": {"label": "重体力劳动年限（年）", "type": "continuous", "levels": null, "unit_scale": 10, "default": 0.0}, "既往腰背损伤史": {"label": "既往腰背损伤史", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "吸烟史": {"label": "吸烟史", "type": "binary", "levels": {"0": "否", "1": "是（曾经吸烟）"}, "unit_scale": 1, "default": 0}, "糖尿病": {"label": "糖尿病", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}}, "full": {"intercept": -7.576006819067619, "coefs": {"年龄（岁）": 0.05179354896971731, "性别": 0.3991245007035458, "BMI（kg/m²）": 0.08795983264704497, "重体力劳动年限（年）": 0.017042924868391963, "既往腰背损伤史": 0.03489081715470277, "吸烟史": 0.07131799202554444, "糖尿病": -0.0758324850027371}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）", "既往腰背损伤史", "吸烟史", "糖尿病"], "auc": 0.6432561247216035, "brier": 0.163530332537667, "cutoff": 0.205789176971719, "sens": 0.7, "spec": 0.5478841870824054, "cal_intercept": 2.052689321231177e-15, "cal_slope": 1.0000000000000016, "n": 1148, "events": 250}, "simple": {"intercept": -7.515863697664736, "coefs": {"年龄（岁）": 0.05176022906820823, "性别": 0.3730693067775252, "BMI（kg/m²）": 0.08666754021548449, "重体力劳动年限（年）": 0.01710753631098164}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）"], "auc": 0.6431492204899777, "brier": 0.16362763450475468, "cutoff": 0.2064101819612738, "sens": 0.692, "spec": 0.5579064587973275, "cal_intercept": -1.4898441073645e-15, "cal_slope": 0.9999999999999991, "n": 1148, "events": 250}, "univariate": [{"var": "年龄（岁）", "OR": 1.254960604771786, "OR_low": 1.1285218680443456, "OR_high": 1.3955654419514354, "p": 2.7714339463694638e-05}, {"var": "性别", "OR": 1.4049767895921732, "OR_low": 1.0612212164316546, "OR_high": 1.8600832217905978, "p": 0.017548538971360834}, {"var": "BMI（kg/m²）", "OR": 1.0786786682331175, "OR_low": 1.0342539792525043, "OR_high": 1.1250115471077167, "p": 0.0004162265062741981}, {"var": "重体力劳动年限（年）", "OR": 1.1645621083958848, "OR_low": 1.0396712958068643, "OR_high": 1.3044554656661458, "p": 0.008484975853902912}, {"var": "既往腰背损伤史", "OR": 1.033220749105209, "OR_low": 0.6416740954227655, "OR_high": 1.6636874139015687, "p": 0.8930346194474982}, {"var": "吸烟史", "OR": 0.8912198604060928, "OR_low": 0.6513079739504031, "OR_high": 1.2195042458404466, "p": 0.4716832807990512}, {"var": "糖尿病", "OR": 0.9041215170278628, "OR_low": 0.6063189199635282, "OR_high": 1.348194309361046, "p": 0.6210123730889161}], "full_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05179354896971731, "unit_scale": 5, "OR": 1.2955920146374753, "OR_low": 1.1599987279887383, "OR_high": 1.4470349215837142, "p": 4.4040616474785255e-06}, {"var": "性别", "label": "女性 vs 男性", "unit": "—", "beta": 0.3991245007035458, "unit_scale": 1, "OR": 1.490519177742319, "OR_low": 1.0663482612218529, "OR_high": 2.0834163659365936, "p": 0.019494449867054547}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08795983264704497, "unit_scale": 1, "OR": 1.091944260636781, "OR_low": 1.0445884543928983, "OR_high": 1.14144691464217, "p": 0.00010091939007057515}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.017042924868391963, "unit_scale": 10, "OR": 1.185813751082301, "OR_low": 1.055430660732054, "OR_high": 1.332303773779472, "p": 0.004134172069494678}, {"var": "既往腰背损伤史", "label": "有 vs 无", "unit": "—", "beta": 0.03489081715470277, "unit_scale": 1, "OR": 1.0355066430657023, "OR_low": 0.6320437927987999, "OR_high": 1.696518532497541, "p": 0.8898308013582553}, {"var": "吸烟史", "label": "是（曾经吸烟） vs 否", "unit": "—", "beta": 0.07131799202554444, "unit_scale": 1, "OR": 1.0739226704224032, "OR_low": 0.7363273481902365, "OR_high": 1.5663005114258206, "p": 0.7110996793713229}, {"var": "糖尿病", "label": "有 vs 无", "unit": "—", "beta": -0.0758324850027371, "unit_scale": 1, "OR": 0.9269714751782353, "OR_low": 0.6087494138934967, "OR_high": 1.4115432330329072, "p": 0.7237555094886066}], "simple_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05176022906820823, "unit_scale": 5, "OR": 1.2953761876246932, "OR_low": 1.159846007409387, "OR_high": 1.44674332346329, "p": 4.435897575387088e-06}, {"var": "性别", "label": "女性 vs 男性", "unit": "—", "beta": 0.3730693067775252, "unit_scale": 1, "OR": 1.4521849826066366, "OR_low": 1.0829391899557104, "OR_high": 1.9473311551265262, "p": 0.012693670923774604}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08666754021548449, "unit_scale": 1, "OR": 1.090534060724666, "OR_low": 1.043648632814327, "OR_high": 1.1395257946092754, "p": 0.00011089130334074653}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.01710753631098164, "unit_scale": 10, "OR": 1.1865801700238066, "OR_low": 1.05650589648586, "OR_high": 1.33266885170912, "p": 0.0038790162257044914}], "auc_diff": 0.00010690423162584839, "auc_diff_ci": [-0.0031256606102519372, 0.003550499082842605]};
+const MODEL = {"outcome": "腰椎滑脱（最大前滑移 ≥3 mm）", "cohort": {"n_all": 1200, "events_all": 263, "prevalence": 0.21916666666666668, "n_complete": 1148, "events_complete": 250, "n_extended": 1030, "events_extended": 227}, "vars_meta": {"年龄（岁）": {"label": "年龄（岁）", "type": "continuous", "levels": null, "unit_scale": 5, "default": 71.5}, "性别": {"label": "性别", "type": "binary", "levels": {"0": "男性", "1": "女性"}, "unit_scale": 1, "default": 1}, "BMI（kg/m²）": {"label": "BMI（kg/m²）", "type": "continuous", "levels": null, "unit_scale": 1, "default": 24.34}, "重体力劳动年限（年）": {"label": "重体力劳动年限（年）", "type": "continuous", "levels": null, "unit_scale": 10, "default": 0.0}, "既往腰背损伤史": {"label": "既往腰背损伤史", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "吸烟史": {"label": "吸烟史", "type": "binary", "levels": {"0": "否", "1": "是（曾经吸烟）"}, "unit_scale": 1, "default": 0}, "糖尿病": {"label": "糖尿病", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "膝痛": {"label": "膝痛", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "近3个月下腰痛": {"label": "近3个月下腰痛", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "下肢症状": {"label": "下肢症状", "type": "binary", "levels": {"0": "无", "1": "有"}, "unit_scale": 1, "default": 0}, "步速（m/s）": {"label": "步速（m/s）", "type": "continuous", "levels": null, "unit_scale": 0.1, "default": 1.03}, "握力（kg）": {"label": "握力（kg）", "type": "continuous", "levels": null, "unit_scale": 5, "default": 26.3}, "休闲活动时间（分钟/周）": {"label": "休闲活动时间（分钟/周）", "type": "continuous", "levels": null, "unit_scale": 60, "default": 80.0}}, "simple": {"intercept": -7.515863697664736, "coefs": {"年龄（岁）": 0.05176022906820823, "性别": 0.3730693067775252, "BMI（kg/m²）": 0.08666754021548449, "重体力劳动年限（年）": 0.01710753631098164}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）"], "auc": 0.6431492204899777, "brier": 0.16362763450475468, "cutoff": 0.2064101819612738, "sens": 0.692, "spec": 0.5579064587973275, "cal_intercept": -1.4898441073645e-15, "cal_slope": 0.9999999999999991, "n": 1148, "events": 250}, "full": {"intercept": -7.576006819067619, "coefs": {"年龄（岁）": 0.05179354896971731, "性别": 0.3991245007035458, "BMI（kg/m²）": 0.08795983264704497, "重体力劳动年限（年）": 0.017042924868391963, "既往腰背损伤史": 0.03489081715470277, "吸烟史": 0.07131799202554444, "糖尿病": -0.0758324850027371}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）", "既往腰背损伤史", "吸烟史", "糖尿病"], "auc": 0.6432561247216035, "brier": 0.163530332537667, "cutoff": 0.205789176971719, "sens": 0.7, "spec": 0.5478841870824054, "cal_intercept": 2.052689321231177e-15, "cal_slope": 1.0000000000000016, "n": 1148, "events": 250}, "extended": {"intercept": -5.017437760873911, "coefs": {"年龄（岁）": 0.04128145721320532, "性别": 0.05492426475372174, "BMI（kg/m²）": 0.06839319430296796, "重体力劳动年限（年）": 0.019105939150603282, "既往腰背损伤史": -0.08010851578704975, "吸烟史": 0.03234104787594318, "糖尿病": -0.2236619550245058, "膝痛": 0.02545260085017264, "近3个月下腰痛": 0.10858596268889345, "下肢症状": 0.48970812685910464, "步速（m/s）": -0.340107312912147, "握力（kg）": -0.02969269868527003, "休闲活动时间（分钟/周）": -0.000683280727897438}, "vars": ["年龄（岁）", "性别", "BMI（kg/m²）", "重体力劳动年限（年）", "既往腰背损伤史", "吸烟史", "糖尿病", "膝痛", "近3个月下腰痛", "下肢症状", "步速（m/s）", "握力（kg）", "休闲活动时间（分钟/周）"], "auc": 0.6638431871670663, "brier": 0.16223491191289535, "cutoff": 0.23295722081483666, "sens": 0.5814977973568282, "spec": 0.6811955168119552, "cal_intercept": -1.7365655052528502e-15, "cal_slope": 0.9999999999999992, "n": 1030, "events": 227}, "compare": {"n": 1030, "events": 227, "auc": {"simple": 0.6499799759711654, "full": 0.6501061547829998, "extended": 0.6638431871670663}, "brier": {"simple": 0.16468831016893173, "full": 0.16445288948583958, "extended": 0.16223491191289535}, "cutoff": {"simple": 0.21920552341950827, "full": 0.22340412018383352, "extended": 0.23295722081483666}, "sens": {"simple": 0.6343612334801763, "full": 0.6123348017621145, "extended": 0.5814977973568282}, "spec": {"simple": 0.6127023661270237, "full": 0.6301369863013699, "extended": 0.6811955168119552}, "auc_diff_ext_vs_full": 0.013737032384066428, "auc_diff_ci": [-0.006587689039153707, 0.033099436203060564]}, "univariate": [{"var": "年龄（岁）", "OR": 1.254960604771786, "OR_low": 1.1285218680443456, "OR_high": 1.3955654419514354, "p": 2.7714339463694638e-05}, {"var": "性别", "OR": 1.4049767895921732, "OR_low": 1.0612212164316546, "OR_high": 1.8600832217905978, "p": 0.017548538971360834}, {"var": "BMI（kg/m²）", "OR": 1.0786786682331175, "OR_low": 1.0342539792525043, "OR_high": 1.1250115471077167, "p": 0.0004162265062741981}, {"var": "重体力劳动年限（年）", "OR": 1.1645621083958848, "OR_low": 1.0396712958068643, "OR_high": 1.3044554656661458, "p": 0.008484975853902912}, {"var": "既往腰背损伤史", "OR": 1.033220749105209, "OR_low": 0.6416740954227655, "OR_high": 1.6636874139015687, "p": 0.8930346194474982}, {"var": "吸烟史", "OR": 0.8912198604060928, "OR_low": 0.6513079739504031, "OR_high": 1.2195042458404466, "p": 0.4716832807990512}, {"var": "糖尿病", "OR": 0.9041215170278628, "OR_low": 0.6063189199635282, "OR_high": 1.348194309361046, "p": 0.6210123730889161}, {"var": "膝痛", "OR": 1.2332461873638352, "OR_low": 0.916183090425477, "OR_high": 1.660035176965697, "p": 0.16677434807292568}, {"var": "近3个月下腰痛", "OR": 1.322555385790681, "OR_low": 1.004320935836431, "OR_high": 1.7416272887184079, "p": 0.04651770786182132}, {"var": "下肢症状", "OR": 1.4571506021763536, "OR_low": 1.0047551673752444, "OR_high": 2.113239071931967, "p": 0.04714716376022874}, {"var": "步速（m/s）", "OR": 0.8859511732544595, "OR_low": 0.8242454137933781, "OR_high": 0.952276431577106, "p": 0.0010106838210019304}, {"var": "握力（kg）", "OR": 0.8338794286367434, "OR_low": 0.7617050478640863, "OR_high": 0.9128925999025493, "p": 8.386326308164521e-05}, {"var": "休闲活动时间（分钟/周）", "OR": 0.9180397252932143, "OR_low": 0.842207279735457, "OR_high": 1.000700133441222, "p": 0.05188905811739261}], "simple_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05176022906820823, "unit_scale": 5, "OR": 1.2953761876246932, "OR_low": 1.159846007409387, "OR_high": 1.44674332346329, "p": 4.435897575387088e-06}, {"var": "性别", "label": "性别", "unit": "女性 vs 男性", "beta": 0.3730693067775252, "unit_scale": 1, "OR": 1.4521849826066366, "OR_low": 1.0829391899557104, "OR_high": 1.9473311551265262, "p": 0.012693670923774604}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08666754021548449, "unit_scale": 1, "OR": 1.090534060724666, "OR_low": 1.043648632814327, "OR_high": 1.1395257946092754, "p": 0.00011089130334074653}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.01710753631098164, "unit_scale": 10, "OR": 1.1865801700238066, "OR_low": 1.05650589648586, "OR_high": 1.33266885170912, "p": 0.0038790162257044914}], "full_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.05179354896971731, "unit_scale": 5, "OR": 1.2955920146374753, "OR_low": 1.1599987279887383, "OR_high": 1.4470349215837142, "p": 4.4040616474785255e-06}, {"var": "性别", "label": "性别", "unit": "女性 vs 男性", "beta": 0.3991245007035458, "unit_scale": 1, "OR": 1.490519177742319, "OR_low": 1.0663482612218529, "OR_high": 2.0834163659365936, "p": 0.019494449867054547}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.08795983264704497, "unit_scale": 1, "OR": 1.091944260636781, "OR_low": 1.0445884543928983, "OR_high": 1.14144691464217, "p": 0.00010091939007057515}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.017042924868391963, "unit_scale": 10, "OR": 1.185813751082301, "OR_low": 1.055430660732054, "OR_high": 1.332303773779472, "p": 0.004134172069494678}, {"var": "既往腰背损伤史", "label": "既往腰背损伤史", "unit": "有 vs 无", "beta": 0.03489081715470277, "unit_scale": 1, "OR": 1.0355066430657023, "OR_low": 0.6320437927987999, "OR_high": 1.696518532497541, "p": 0.8898308013582553}, {"var": "吸烟史", "label": "吸烟史", "unit": "是（曾经吸烟） vs 否", "beta": 0.07131799202554444, "unit_scale": 1, "OR": 1.0739226704224032, "OR_low": 0.7363273481902365, "OR_high": 1.5663005114258206, "p": 0.7110996793713229}, {"var": "糖尿病", "label": "糖尿病", "unit": "有 vs 无", "beta": -0.0758324850027371, "unit_scale": 1, "OR": 0.9269714751782353, "OR_low": 0.6087494138934967, "OR_high": 1.4115432330329072, "p": 0.7237555094886066}], "ext_table": [{"var": "年龄（岁）", "label": "年龄（岁）", "unit": "每增加 5 岁", "beta": 0.04128145721320532, "unit_scale": 5, "OR": 1.2292537599817046, "OR_low": 1.062465493888756, "OR_high": 1.4222248300022176, "p": 0.005530209517500697}, {"var": "性别", "label": "性别", "unit": "女性 vs 男性", "beta": 0.05492426475372174, "unit_scale": 1, "OR": 1.0564606003418298, "OR_low": 0.6166875430055722, "OR_high": 1.8098452169716268, "p": 0.8415006760219182}, {"var": "BMI（kg/m²）", "label": "BMI（kg/m²）", "unit": "每增加 1 kg/m²", "beta": 0.06839319430296796, "unit_scale": 1, "OR": 1.0707862527711884, "OR_low": 1.0212815351321785, "OR_high": 1.1226906192672599, "p": 0.004627122733757036}, {"var": "重体力劳动年限（年）", "label": "重体力劳动年限（年）", "unit": "每增加 10 年", "beta": 0.019105939150603282, "unit_scale": 10, "OR": 1.2105313452260502, "OR_low": 1.0682733396148072, "OR_high": 1.371733322768471, "p": 0.0027410416644360253}, {"var": "既往腰背损伤史", "label": "既往腰背损伤史", "unit": "有 vs 无", "beta": -0.08010851578704975, "unit_scale": 1, "OR": 0.9230161791247321, "OR_low": 0.5324642253894323, "OR_high": 1.6000302486104414, "p": 0.7753343599502446}, {"var": "吸烟史", "label": "吸烟史", "unit": "是（曾经吸烟） vs 否", "beta": 0.03234104787594318, "unit_scale": 1, "OR": 1.0328697032619456, "OR_low": 0.6922598896394362, "OR_high": 1.5410683760286517, "p": 0.8741299478301028}, {"var": "糖尿病", "label": "糖尿病", "unit": "有 vs 无", "beta": -0.2236619550245058, "unit_scale": 1, "OR": 0.7995853845101527, "OR_low": 0.5024864796068206, "OR_high": 1.2723462482463392, "p": 0.3453257025861526}, {"var": "膝痛", "label": "膝痛", "unit": "有 vs 无", "beta": 0.02545260085017264, "unit_scale": 1, "OR": 1.0257792840521531, "OR_low": 0.7188088029925052, "OR_high": 1.4638428678251998, "p": 0.8884368494359604}, {"var": "近3个月下腰痛", "label": "近3个月下腰痛", "unit": "有 vs 无", "beta": 0.10858596268889345, "unit_scale": 1, "OR": 1.1147007270916842, "OR_low": 0.8139109671283595, "OR_high": 1.5266506548777952, "p": 0.4985781192394444}, {"var": "下肢症状", "label": "下肢症状", "unit": "有 vs 无", "beta": 0.48970812685910464, "unit_scale": 1, "OR": 1.6318398602150148, "OR_low": 1.0817646077844845, "OR_high": 2.46162733576608, "p": 0.019561487104532607}, {"var": "步速（m/s）", "label": "步速（m/s）", "unit": "每增加 0.1 m/s", "beta": -0.340107312912147, "unit_scale": 0.1, "OR": 0.9665611321328659, "OR_low": 0.8792354531825896, "OR_high": 1.0625599988811587, "p": 0.4814540401762206}, {"var": "握力（kg）", "label": "握力（kg）", "unit": "每增加 5 kg", "beta": -0.02969269868527003, "unit_scale": 5, "OR": 0.8620314764116602, "OR_low": 0.731458431300286, "OR_high": 1.0159131873064735, "p": 0.07646570114891618}, {"var": "休闲活动时间（分钟/周）", "label": "休闲活动时间（分钟/周）", "unit": "每增加 60 分钟/周", "beta": -0.000683280727897438, "unit_scale": 60, "OR": 0.959832159486366, "OR_low": 0.8744066796489431, "OR_high": 1.053603312767619, "p": 0.38867067920786735}]};
 
 const RANGES = {
   '年龄（岁）': [60, 90],
   'BMI（kg/m²）': [12, 40],
   '重体力劳动年限（年）': [0, 60],
+  '步速（m/s）': [0.3, 1.8],
+  '握力（kg）': [5, 55],
+  '休闲活动时间（分钟/周）': [0, 600],
 };
 const VIEW_VARS = {
   simple: MODEL.simple.vars,
   full: MODEL.full.vars,
-  compare: MODEL.full.vars,
+  extended: MODEL.extended.vars,
+  compare: MODEL.extended.vars,
 };
 const MODEL_TITLE = {
-  simple: '简化 Logistic 模型（4 项危险因素）',
+  simple: '简化 Logistic 模型（4 项核心因素）',
   full: '完整 Logistic 模型（7 项候选因素）',
+  extended: '扩展 Logistic 模型（13 项，含症状与功能指标）',
 };
+const MODEL_KEYS = ['simple', 'full', 'extended'];
 
 let state = { view: 'simple', vals: {}, dirty: false, last: null };
 
@@ -304,20 +311,22 @@ function singleResultHTML(key, p){
 }
 
 function metricTable(){
-  const s = MODEL.simple, f = MODEL.full;
+  const c = MODEL.compare;
+  const cols = ['simple', 'full', 'extended'];
   const rows = [
-    ['AUC（判别力）', s.auc.toFixed(3), f.auc.toFixed(3)],
-    ['Brier 评分（越低越好）', s.brier.toFixed(3), f.brier.toFixed(3)],
-    ['Youden 分类阈值', fmtPct(s.cutoff), fmtPct(f.cutoff)],
-    ['敏感度', fmtPct(s.sens), fmtPct(f.sens)],
-    ['特异度', fmtPct(s.spec), fmtPct(f.spec)],
+    ['AUC（判别力）', cols.map(k => c.auc[k].toFixed(3))],
+    ['Brier 评分（越低越好）', cols.map(k => c.brier[k].toFixed(3))],
+    ['Youden 分类阈值', cols.map(k => fmtPct(c.cutoff[k]))],
+    ['敏感度', cols.map(k => fmtPct(c.sens[k]))],
+    ['特异度', cols.map(k => fmtPct(c.spec[k]))],
   ];
-  let h = `<table class="metric"><thead><tr><th>指标</th><th>简化模型</th><th>完整模型</th></tr></thead><tbody>`;
-  for(const r of rows){ h += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`; }
+  let h = `<table class="metric"><thead><tr><th>指标（共同样本 n=${c.n}，事件 ${c.events}）</th>
+    <th>简化模型</th><th>完整模型</th><th>扩展模型</th></tr></thead><tbody>`;
+  for(const r of rows){ h += `<tr><td>${r[0]}</td>${r[1].map(v=>`<td>${v}</td>`).join('')}</tr>`; }
   h += `</tbody></table>`;
-  const ci = MODEL.auc_diff_ci;
-  h += `<div class="cmp-note">ΔAUC（完整 − 简化）=${MODEL.auc_diff.toFixed(3)}，95%CI ${ci[0].toFixed(3)}～${ci[1].toFixed(3)}；
-    两模型判别力接近，简化模型变量更少、便于床旁快速评估。</div>`;
+  const ci = c.auc_diff_ci;
+  h += `<div class="cmp-note">ΔAUC（扩展 − 完整）=${c.auc_diff_ext_vs_full.toFixed(3)}，95%CI ${ci[0].toFixed(3)}～${ci[1].toFixed(3)}；
+    加入症状与功能指标后判别力仅有小幅提升，置信区间跨 0，差异无统计学意义。简化模型变量最少，便于床旁快速评估。</div>`;
   return h;
 }
 
@@ -325,21 +334,25 @@ function renderResult(){
   const panel = $('#result-panel');
   const pS = predict(MODEL.simple, state.vals);
   const pF = predict(MODEL.full, state.vals);
-  state.last = { pS, pF };
+  const pE = predict(MODEL.extended, state.vals);
+  state.last = { pS, pF, pE };
   let html = '';
   if(state.view === 'simple'){
     html = singleResultHTML('simple', pS);
   } else if(state.view === 'full'){
     html = singleResultHTML('full', pF);
+  } else if(state.view === 'extended'){
+    html = singleResultHTML('extended', pE);
   } else {
-    html = `<div class="res-top"><div><div class="cap">两模型比较</div><div class="res-title">简化模型 vs 完整模型</div></div>
-      <div class="meta">完整病例 n=${MODEL.full.n}；事件=${MODEL.full.events}</div></div>
-      <div class="compare-cards" style="margin-top:16px">
-        <div class="ccard"><h3>${MODEL_TITLE.simple}</h3><div class="p">${fmtPct(pS)}</div>
-          <div class="${pS>=MODEL.simple.cutoff?'verdict high':'verdict low'}">${pS>=MODEL.simple.cutoff?'↑ 高于':'↓ 低于'}阈值 ${fmtPct(MODEL.simple.cutoff)}</div></div>
-        <div class="ccard"><h3>${MODEL_TITLE.full}</h3><div class="p">${fmtPct(pF)}</div>
-          <div class="${pF>=MODEL.full.cutoff?'verdict high':'verdict low'}">${pF>=MODEL.full.cutoff?'↑ 高于':'↓ 低于'}阈值 ${fmtPct(MODEL.full.cutoff)}</div></div>
-      </div>
+    const cards = MODEL_KEYS.map(k => {
+      const p = {simple:pS, full:pF, extended:pE}[k];
+      const m = MODEL[k];
+      return `<div class="ccard"><h3>${MODEL_TITLE[k]}</h3><div class="p">${fmtPct(p)}</div>
+        <div class="${p>=m.cutoff?'verdict high':'verdict low'}">${p>=m.cutoff?'↑ 高于':'↓ 低于'}阈值 ${fmtPct(m.cutoff)}</div></div>`;
+    }).join('');
+    html = `<div class="res-top"><div><div class="cap">三模型比较</div><div class="res-title">简化 / 完整 / 扩展模型</div></div>
+      <div class="meta">共同样本 n=${MODEL.compare.n}；事件=${MODEL.compare.events}</div></div>
+      <div class="compare-cards" style="margin-top:16px">${cards}</div>
       ${metricTable()}`;
   }
   html += `<div class="actions">
@@ -353,9 +366,11 @@ function renderResult(){
 
 /* ---------- 摘要下载 ---------- */
 function downloadSummary(){
-  const {pS, pF} = state.last;
-  const modelKey = state.view === 'full' ? 'full' : 'simple';
-  const p = state.view === 'full' ? pF : pS;
+  const {pS, pF, pE} = state.last;
+  const KEY_BY_VIEW = {simple:'simple', full:'full', extended:'extended'};
+  const modelKey = KEY_BY_VIEW[state.view] || 'simple';
+  const pMap = {simple:pS, full:pF, extended:pE};
+  const p = pMap[modelKey];
   const m = MODEL[modelKey];
   const time = new Date().toLocaleString('zh-CN');
   const varLabel = v => MODEL.vars_meta[v].type === 'binary'
@@ -373,7 +388,7 @@ function downloadSummary(){
   lines.push(`分类：${p>=m.cutoff?'高于':'低于'}统计学分类阈值 ${fmtPct(m.cutoff)}（Youden 指数确定，非诊断 / 治疗阈值）`);
   lines.push(`模型评价：AUC=${m.auc.toFixed(3)}，Brier=${m.brier.toFixed(3)}，敏感度=${fmtPct(m.sens)}，特异度=${fmtPct(m.spec)}`);
   if(state.view === 'compare'){
-    lines.push(`两模型概率：简化 ${fmtPct(pS)}；完整 ${fmtPct(pF)}`);
+    lines.push(`三模型概率：简化 ${fmtPct(pS)}；完整 ${fmtPct(pF)}；扩展 ${fmtPct(pE)}`);
   }
   lines.push('', '说明：本摘要为研究模型的辅助风险分层结果，不能替代影像诊断与临床判断，不作为单独治疗决策依据。');
   const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
@@ -399,29 +414,33 @@ function formulaText(model, vars){
   const terms = [`${model.intercept.toFixed(4)}（截距）`];
   for(const v of vars){
     const isBin = MODEL.vars_meta[v].type === 'binary';
-    const name = isBin ? (v === '性别' ? '女性（指示变量）' : `${MODEL.vars_meta[v].levels[1]}（指示变量）`) : v;
+    const name = isBin ? `${v}（${MODEL.vars_meta[v].levels[1]}=1 指示变量）` : v;
     terms.push(`${model.coefs[v].toFixed(4)}·${name}`);
   }
   return `logit(P) = ln[P/(1−P)] = ${terms.join(' + ')}<br>P = 1 / [1 + exp(−logit(P))]`;
 }
 
 function renderInfo(){
-  const c = MODEL.cohort;
+  const c = MODEL.cohort, cmp = MODEL.compare;
   $('#chip-n').textContent = c.n_all;
   $('#chip-e').textContent = c.events_all;
   $('#chip-rate').textContent = fmtPct(c.prevalence);
-  const s = MODEL.simple, f = MODEL.full;
+  const cols = ['simple', 'full', 'extended'];
+  const metricRows = [
+    ['AUC', cols.map(k => cmp.auc[k].toFixed(3))],
+    ['Brier 评分', cols.map(k => cmp.brier[k].toFixed(3))],
+    ['Youden 分类阈值', cols.map(k => fmtPct(cmp.cutoff[k]))],
+    ['敏感度', cols.map(k => fmtPct(cmp.sens[k]))],
+    ['特异度', cols.map(k => fmtPct(cmp.spec[k]))],
+  ];
   $('#acc-info-body').innerHTML = `
     <p><b>研究设计：</b>社区老年人横断面研究，纳入 ${c.n_all} 名 60 岁及以上社区居民；以腰椎 X 线最大前滑移 ≥3 mm 判定腰椎滑脱，共检出 ${c.events_all} 例（${fmtPct(c.prevalence)}）。</p>
-    <p><b>建模口径：</b>主模型采用完整病例 ${c.n_complete} 例（滑脱 ${c.events_complete} 例）；结局为二分类变量（滑脱有 / 无），方法为多因素 Logistic 回归，OR 为患病优势比。</p>
-    <p><b>候选因素：</b>年龄、性别、BMI、重体力劳动年限、既往腰背损伤史、吸烟史、糖尿病。症状与身体功能指标（下腰痛、下肢症状、步速、握力等）在原研究中作为次要结局分析，未纳入滑脱预测模型。</p>
-    <p><b>模型构成：</b>完整模型纳入全部 7 项候选因素；简化模型仅保留调整后关联有统计学意义的 4 项（年龄、女性、BMI、重体力劳动年限）。</p>
-    <table class="metric"><thead><tr><th>评价指标</th><th>简化模型</th><th>完整模型</th></tr></thead><tbody>
-      <tr><td>AUC</td><td>${s.auc.toFixed(3)}</td><td>${f.auc.toFixed(3)}</td></tr>
-      <tr><td>Brier 评分</td><td>${s.brier.toFixed(3)}</td><td>${f.brier.toFixed(3)}</td></tr>
-      <tr><td>Youden 分类阈值</td><td>${fmtPct(s.cutoff)}</td><td>${fmtPct(f.cutoff)}</td></tr>
-      <tr><td>敏感度</td><td>${fmtPct(s.sens)}</td><td>${fmtPct(f.sens)}</td></tr>
-      <tr><td>特异度</td><td>${fmtPct(s.spec)}</td><td>${fmtPct(f.spec)}</td></tr>
+    <p><b>建模口径：</b>结局为二分类变量（滑脱有 / 无），方法为多因素 Logistic 回归，OR 为患病优势比。简化 / 完整模型基于核心变量完整病例 ${c.n_complete} 例（滑脱 ${c.events_complete} 例）；扩展模型纳入症状与功能指标，完整病例 ${c.n_extended} 例（滑脱 ${c.events_extended} 例）。</p>
+    <p><b>候选因素：</b>年龄、性别、BMI、重体力劳动年限、既往腰背损伤史、吸烟史、糖尿病，以及膝痛、近 3 个月下腰痛、下肢症状、步速、握力、每周休闲活动时间。腰围与 BMI 高度相关（r=0.80），未与 BMI 同时纳入同一模型；腰痛 NRS 评分与下腰痛高度相关，未重复纳入。</p>
+    <p><b>模型构成：</b>简化模型纳入 4 项核心因素（年龄、女性、BMI、重体力劳动年限）；完整模型纳入 7 项核心候选因素；扩展模型在完整模型基础上加入 6 项症状与功能指标。</p>
+    <table class="metric"><thead><tr><th>评价指标（共同样本 n=${cmp.n}，事件 ${cmp.events}）</th>
+      <th>简化模型</th><th>完整模型</th><th>扩展模型</th></tr></thead><tbody>
+      ${metricRows.map(r=>`<tr><td>${r[0]}</td>${r[1].map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}
     </tbody></table>
     <p style="margin-top:12px"><b>单因素粗关联（未调整，补充参考）：</b></p>
     <table class="or"><thead><tr><th>变量</th><th class="num">粗 OR</th><th class="num">95%CI</th><th class="num">P</th></tr></thead><tbody>
@@ -435,15 +454,19 @@ function renderInfo(){
     ${orTable(MODEL.simple_table)}
     <p style="margin-top:16px"><b>完整模型（7 项）</b></p>
     <div class="formula">${formulaText(MODEL.full, MODEL.full.vars)}</div>
-    ${orTable(MODEL.full_table)}`;
+    ${orTable(MODEL.full_table)}
+    <p style="margin-top:16px"><b>扩展模型（13 项，含症状与功能指标）</b></p>
+    <div class="formula">${formulaText(MODEL.extended, MODEL.extended.vars)}</div>
+    ${orTable(MODEL.ext_table)}`;
 
   $('#acc-usage-body').innerHTML = `
     <ul>
-      <li>选择模型视图（简化 / 完整 / 两模型比较），录入研究对象的各项因素后点击「计算风险」，工具输出预测滑脱概率及与分类阈值的比较。</li>
+      <li>选择模型视图（简化 / 完整 / 扩展 / 模型比较），录入研究对象的各项因素后点击「计算风险」，工具输出预测滑脱概率及与分类阈值的比较。</li>
       <li>分类阈值由训练队列 Youden 指数确定，用于研究性风险分层，<b>不是</b>诊断阈值或治疗决策阈值。</li>
       <li>本模型基于横断面资料，输出为患病优势估计，不能预测个体未来是否新发滑脱；概率需结合影像、病史与临床查体综合判断。</li>
-      <li>输入值若超出本研究队列范围（年龄 60–90 岁、BMI 12–40、重体力劳动 0–60 年），外推不确定性增大，结果应谨慎解释。</li>
-      <li>性别编码：0=男性，1=女性；损伤史 / 吸烟史 / 糖尿病：0=无，1=有。吸烟史指曾经吸烟。</li>
+      <li>扩展模型中的下腰痛、下肢症状、步速、握力等症状与功能指标可能是滑脱的结果而非原因（反向因果），其关联解释需谨慎；扩展模型判别力提升有限。</li>
+      <li>输入值若超出本研究队列范围（年龄 60–90 岁、BMI 12–40、重体力劳动 0–60 年、步速 0.3–1.8 m/s、握力 5–55 kg、休闲活动 0–600 分钟/周），外推不确定性增大，结果应谨慎解释。</li>
+      <li>性别编码：0=男性，1=女性；损伤史 / 吸烟史 / 糖尿病 / 膝痛 / 下腰痛 / 下肢症状：0=无，1=有。吸烟史指曾经吸烟。</li>
       <li>「下载结果摘要」可导出文本记录；「打印 / 保存为 PDF」可通过浏览器打印另存为 PDF。</li>
     </ul>`;
 }
