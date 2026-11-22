@@ -67,12 +67,15 @@
   .verdict.high{color:var(--bad)}
   .verdict.low{color:var(--good)}
   /* gauge */
-  .gauge{position:relative;margin:26px 6px 34px;height:56px}
-  .gauge .track{position:absolute;top:26px;left:0;right:0;height:6px;border-radius:3px;background:#e8edf2}
-  .gauge .axis{position:absolute;top:38px;font-size:11px;color:var(--muted)}
+  .gauge{position:relative;margin:38px 6px 34px;height:64px}
+  .gauge .track{position:absolute;top:30px;left:0;right:0;height:6px;border-radius:3px;background:#e8edf2}
+  .gauge .axis{position:absolute;top:42px;font-size:11px;color:var(--muted)}
   .gauge .axis.l{left:0}.gauge .axis.r{right:0}
-  .gmarker{position:absolute;top:18px;width:1px;height:22px}
+  .gmarker{position:absolute;top:22px;width:1px;height:22px}
   .gmarker .tag{position:absolute;top:-16px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px}
+  .gmarker.row1 .tag{top:-30px}
+  .gmarker.edge-l .tag{left:0;transform:none}
+  .gmarker.edge-r .tag{left:auto;right:0;transform:none}
   .gmarker.cutoff{background:#8a5a17}
   .gmarker.cutoff .tag{color:#8a5a17}
   .gmarker.prev{background:var(--muted)}
@@ -267,11 +270,13 @@ function gaugeHTML(p, model){
   const left = Math.min(100, Math.max(0, p/MAX*100));
   const cutL = model.cutoff/MAX*100;
   const prevL = MODEL.cohort.prevalence/MAX*100;
+  const close = Math.abs(cutL - prevL) < 12;
+  const edge = l => l < 12 ? 'edge-l' : (l > 88 ? 'edge-r' : '');
   return `<div class="gauge">
     <div class="track"></div>
     <div class="axis l">0%</div><div class="axis r">${MAX*100}%</div>
-    <div class="gmarker cutoff" style="left:${cutL}%"><span class="tag">阈值 ${fmtPct(model.cutoff)}</span></div>
-    <div class="gmarker prev" style="left:${prevL}%"><span class="tag">队列检出率 ${fmtPct(MODEL.cohort.prevalence)}</span></div>
+    <div class="gmarker cutoff ${edge(cutL)}" style="left:${cutL}%"><span class="tag">阈值 ${fmtPct(model.cutoff)}</span></div>
+    <div class="gmarker prev ${close?'row1':''} ${edge(prevL)}" style="left:${prevL}%"><span class="tag">队列检出率 ${fmtPct(MODEL.cohort.prevalence)}</span></div>
     <div class="dot" style="left:${left}%"></div>
   </div>`;
 }
